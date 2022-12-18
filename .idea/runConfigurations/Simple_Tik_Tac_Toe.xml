@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Simple Tik Tac Toe" type="JetRunConfigurationType">
+    <option name="MAIN_CLASS_NAME" value="tictactoe.MainKt" />
+    <module name="Simple_Tic_Tac_Toe_Kotlin" />
+    <shortenClasspath name="NONE" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
