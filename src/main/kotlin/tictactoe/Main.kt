@@ -5,4 +5,5 @@ fun main(args: Array<String>) {
     val board = readln()
     ticTacToeGame.initGameBoard(board)
     ticTacToeGame.showGameBoard()
+    println(ticTacToeGame.getGameResult())
 }
