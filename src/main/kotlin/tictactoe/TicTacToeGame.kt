@@ -131,6 +131,20 @@ class TicTacToeGame {
         }
     }
 
+    fun markTurn(inputRow: Int, inputCell: Int) {
+        val properCoordinates = listOf(1,2,3)
+        if (!properCoordinates.contains(inputRow) || !properCoordinates.contains(inputCell)) {
+            throw TicTacToeGameException("Coordinates should be from 1 to 3!")
+        }
+
+        val row = inputRow - 1
+        val cell = inputCell - 1
+        if (gameBoard[row][cell] != "_") {
+            throw TicTacToeGameException("This cell is occupied! Choose another one!")
+        }
+        gameBoard[row][cell] = "X"
+    }
+
     fun showGameBoard() {
         println("---------")
         for (i in gameBoard) {
