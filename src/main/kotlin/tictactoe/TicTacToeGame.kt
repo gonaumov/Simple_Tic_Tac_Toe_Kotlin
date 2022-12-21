@@ -3,14 +3,16 @@ package tictactoe
 class TicTacToeGame {
     private val gameBoard: MutableList<MutableList<String>> = MutableList(3) {
         MutableList(3) {
-            ""
+            " "
         }
     }
+
+    var winner: String? = ""
 
     private val gridHasEmptyCells: Boolean
         get() {
             return gameBoard.fold(0) { acc: Int, strings: MutableList<String> ->
-                acc + strings.filter { it == "_" }.size
+                acc + strings.filter { it == " " }.size
             } > 0
         }
 
@@ -68,81 +70,86 @@ class TicTacToeGame {
         }
     }
 
-    fun getGameResult(): String {
+    val gameStatus: GameStatus
+        get() {
+            val horizontalWinners = listOf(
+                hasThreeHorizontal(0),
+                hasThreeHorizontal(1),
+                hasThreeHorizontal(2)
+            ).filter {
+                isXorO(it)
+            }
 
-        val horizontalWinners = listOf(
-            hasThreeHorizontal(0),
-            hasThreeHorizontal(1),
-            hasThreeHorizontal(2)
-        ).filter {
-            isXorO(it)
-        }
+            val horizontal = horizontalWinners.let {
+                if (it.size == 1) {
+                    it.first()
+                } else {
+                    null
+                }
+            }
 
-        val horizontal = horizontalWinners.let {
-            if (it.size == 1) {
-                it.first()
-            } else {
-                null
+            val verticalWinners = listOf(
+                hasThreeVertical(0),
+                hasThreeVertical(1),
+                hasThreeVertical(2)
+            ).filter {
+                isXorO(it)
+            }
+
+            val vertical = verticalWinners.let {
+                if (it.size == 1) {
+                    it.first()
+                } else {
+                    null
+                }
+            }
+
+            val diagonal = hasThreeDiagonal().let {
+                if (it == "") {
+                    null
+                } else {
+                    it
+                }
+            }
+
+            val isThereNoThree = horizontal == null && vertical == null && diagonal == null
+
+            this.winner = listOfNotNull(horizontal, vertical, diagonal).let {
+                if (it.size == 1) {
+                    it.first()
+                } else {
+                    null
+                }
+            }
+
+
+            val difference = maxOf(countOfO, countOfX) - minOf(countOfO, countOfX)
+
+            return when {
+                verticalWinners.size > 1 || horizontalWinners.size > 1 || difference >= 2 -> GameStatus.IMPOSSIBLE
+                isThereNoThree && gridHasEmptyCells -> GameStatus.GAME_NOT_FINISHED
+                isThereNoThree && !gridHasEmptyCells -> GameStatus.DRAW
+                this.winner != null -> GameStatus.HAS_WINNER
+                else -> GameStatus.IMPOSSIBLE
             }
         }
-
-        val verticalWinners = listOf(
-            hasThreeVertical(0),
-            hasThreeVertical(1),
-            hasThreeVertical(2)
-        ).filter {
-            isXorO(it)
-        }
-
-        val vertical = verticalWinners.let {
-            if (it.size == 1) {
-                it.first()
-            } else {
-                null
-            }
-        }
-
-        val diagonal = hasThreeDiagonal().let {
-            if (it == "") {
-                null
-            } else {
-                it
-            }
-        }
-
-        val isThereNoThree = horizontal == null && vertical == null && diagonal == null
-
-        val winner = listOfNotNull(horizontal, vertical, diagonal).let {
-            if (it.size == 1) {
-                it.first()
-            } else {
-                null
-            }
-        }
-
-        val difference = maxOf(countOfO, countOfX) - minOf(countOfO, countOfX)
-
-        return when {
-            verticalWinners.size > 1 || horizontalWinners.size > 1 || difference >= 2 -> "Impossible"
-            isThereNoThree && gridHasEmptyCells -> "Game not finished"
-            isThereNoThree && !gridHasEmptyCells -> "Draw"
-            winner != null -> "$winner wins"
-            else -> "Impossible"
-        }
-    }
 
     fun markTurn(inputRow: Int, inputCell: Int) {
-        val properCoordinates = listOf(1,2,3)
+        val properCoordinates = listOf(1, 2, 3)
         if (!properCoordinates.contains(inputRow) || !properCoordinates.contains(inputCell)) {
             throw TicTacToeGameException("Coordinates should be from 1 to 3!")
         }
 
         val row = inputRow - 1
         val cell = inputCell - 1
-        if (gameBoard[row][cell] != "_") {
+        if (gameBoard[row][cell] != " ") {
             throw TicTacToeGameException("This cell is occupied! Choose another one!")
         }
-        gameBoard[row][cell] = "X"
+        gameBoard[row][cell] = if (countOfO == countOfX) {
+            "X"
+        } else {
+            "O"
+        }
     }
 
     fun showGameBoard() {
